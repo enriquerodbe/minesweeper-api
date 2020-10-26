@@ -1,0 +1,35 @@
+###
+# summary: Register a new user
+# requestBody:
+#   description: The new user data
+#   required: true
+#   content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/user.dto.UserCredentials'
+# responses:
+#   204:
+#     description: User successfuly registered
+#   400:
+#     description: Invalid input data
+#   409:
+#     description: User already registered
+###
+POST  /    user.UserController.register()
+
+###
+# summary: User login
+# requestBody:
+#   description: The user data for logging in
+#   required: true
+#   content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/user.dto.UserCredentials'
+# responses:
+#   204:
+#     description: User successfuly logged in
+#   400:
+#     description: Invalid input data
+###
+POST  /login    user.UserController.login()

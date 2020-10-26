@@ -1,0 +1,90 @@
+###
+# summary: Create a new board for the logged in user
+# requestBody:
+#   description: The new board data
+#   required: true
+#   content:
+#     application/json:
+#       schema:
+#         $ref: '#/components/schemas/board.dto.BoardParameters'
+# responses:
+#   200:
+#     description: Board created successfully
+#     content:
+#       application/json:
+#         schema:
+#           $ref: '#/components/schemas/board.dto.BoardSummary'
+#   400:
+#     description: Invalid input data
+###
+POST  /    board.BoardController.create()
+
+###
+# summary: Get all boards for the logged in user
+# responses:
+#   200:
+#     description: List of a user's boards
+#     content:
+#       application/json:
+#         schema:
+#           type: array
+#           items:
+#             $ref: '#/components/schemas/board.dto.BoardSummary'
+###
+GET  /    board.BoardController.retrieveAll()
+
+###
+# summary: Get details of a board
+# responses:
+#   200:
+#     description: Board details
+#     content:
+#       application/json:
+#         schema:
+#           $ref: '#/components/schemas/board.dto.BoardDetails'
+#   404:
+#     description: Board not found
+###
+GET  /:boardId    board.BoardController.retrieve(boardId: String)
+
+###
+# summary: Make a move
+# requestBody:
+#   description: Player move
+#   required: true
+#   content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/board.dto.PlayerMove'
+# responses:
+#   200:
+#     description: Board details after player move
+#     content:
+#       application/json:
+#         schema:
+#           $ref: '#/components/schemas/board.dto.BoardDetails'
+#   400:
+#     description: Invalid input data
+#   404:
+#     description: Board not found
+###
+POST  /:boardId/moves    board.BoardController.move(boardId: String)
+
+###
+# summary: Change preserved/resumed board status
+# requestBody:
+#   description: Current status
+#   required: true
+#   content:
+#      application/json:
+#        schema:
+#          $ref: '#/components/schemas/board.dto.ChangeBoardStatus'
+# responses:
+#   204:
+#     description: Board status successfully changed
+#   400:
+#     description: Invalid input data
+#   404:
+#     description: Board not found
+###
+POST  /:boardId/statuses    board.BoardController.changeStatus(boardId: String)
