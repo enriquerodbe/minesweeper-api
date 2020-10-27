@@ -9,5 +9,7 @@ scalaVersion := "2.13.3"
 
 libraryDependencies += guice
 
+libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.14.1" % Test
+
 swaggerDomainNameSpaces := Seq("user.dto", "board.dto")
 swaggerV3 := true
