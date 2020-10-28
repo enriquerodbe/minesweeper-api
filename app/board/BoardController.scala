@@ -11,9 +11,18 @@ class BoardController @Inject()(val controllerComponents: ControllerComponents)
 
   def retrieveAll() = TODO
 
-  def retrieve(boardId: String) = TODO
+  def retrieve(boardId: String) = {
+    val _ = boardId // remove compiler warning
+    TODO
+  }
 
-  def move(boardId: String) = TODO
+  def move(boardId: String) = {
+    val _ = boardId // remove compiler warning
+    TODO
+  }
 
-  def changeStatus(boardId: String) = TODO
+  def changeStatus(boardId: String) = {
+    val _ = boardId // remove compiler warning
+    TODO
+  }
 }
