@@ -1,5 +1,5 @@
 ### NoDocs ###
 GET    /assets/swagger.json    controllers.Assets.at(path = "/public", file = "swagger.json")
 
--> /users  users.Routes
--> /boards boards.Routes
+->  /auth    authentication.Routes
+->  /boards  boards.Routes

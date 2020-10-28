@@ -6,14 +6,14 @@
 #   content:
 #     application/json:
 #       schema:
-#         $ref: '#/components/schemas/board.dto.BoardParameters'
+#         $ref: '#/components/schemas/BoardConfiguration'
 # responses:
-#   200:
+#   201:
 #     description: Board created successfully
 #     content:
 #       application/json:
 #         schema:
-#           $ref: '#/components/schemas/board.dto.BoardSummary'
+#           $ref: '#/components/schemas/BoardSummary'
 #   400:
 #     description: Invalid input data
 ###
@@ -29,7 +29,7 @@ POST  /    board.BoardController.create()
 #         schema:
 #           type: array
 #           items:
-#             $ref: '#/components/schemas/board.dto.BoardSummary'
+#             $ref: '#/components/schemas/BoardSummary'
 ###
 GET  /    board.BoardController.retrieveAll()
 
@@ -41,11 +41,11 @@ GET  /    board.BoardController.retrieveAll()
 #     content:
 #       application/json:
 #         schema:
-#           $ref: '#/components/schemas/board.dto.BoardDetails'
+#           $ref: '#/components/schemas/BoardDetails'
 #   404:
 #     description: Board not found
 ###
-GET  /:boardId    board.BoardController.retrieve(boardId: String)
+GET  /:boardUid    board.BoardController.retrieve(boardUid: String)
 
 ###
 # summary: Make a move
@@ -55,20 +55,20 @@ GET  /:boardId    board.BoardController.retrieve(boardId: String)
 #   content:
 #      application/json:
 #        schema:
-#          $ref: '#/components/schemas/board.dto.PlayerMove'
+#          $ref: '#/components/schemas/PlayerMove'
 # responses:
 #   200:
 #     description: Board details after player move
 #     content:
 #       application/json:
 #         schema:
-#           $ref: '#/components/schemas/board.dto.BoardDetails'
+#           $ref: '#/components/schemas/BoardDetails'
 #   400:
 #     description: Invalid input data
 #   404:
 #     description: Board not found
 ###
-POST  /:boardId/moves    board.BoardController.move(boardId: String)
+POST  /:boardUid/moves    board.BoardController.move(boardUid: String)
 
 ###
 # summary: Change preserved/resumed board status
@@ -78,13 +78,17 @@ POST  /:boardId/moves    board.BoardController.move(boardId: String)
 #   content:
 #      application/json:
 #        schema:
-#          $ref: '#/components/schemas/board.dto.ChangeBoardStatus'
+#          $ref: '#/components/schemas/BoardStatus'
 # responses:
-#   204:
-#     description: Board status successfully changed
+#   200:
+#     description: Board details after status change
+#     content:
+#       application/json:
+#         schema:
+#           $ref: '#/components/schemas/BoardSummary'
 #   400:
 #     description: Invalid input data
 #   404:
 #     description: Board not found
 ###
-POST  /:boardId/statuses    board.BoardController.changeStatus(boardId: String)
+POST  /:boardUid/statuses    board.BoardController.changeStatus(boardUid: String)

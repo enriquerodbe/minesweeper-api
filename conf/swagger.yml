@@ -2,3 +2,74 @@ openapi: "3.0.3"
 info:
   title: "Minesweeper API"
   version: "1.0.0"
+components:
+  schemas:
+    Credentials:
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 4
+    BoardConfiguration:
+      properties:
+        rows:
+          type: integer
+          minimum: 2
+          maximum: 20
+        columns:
+          type: integer
+          minimum: 2
+          maximum: 20
+        mines:
+          type: integer
+          minimum: 1
+    BoardStatus:
+      type: string
+      enum: [ playing, paused ]
+    BoardSummary:
+      properties:
+        uid:
+          type: string
+        rows:
+          type: integer
+        columns:
+          type: integer
+        mines:
+          type: integer
+        status:
+          $ref: '#/components/schemas/BoardStatus'
+        isGameOver:
+          type: boolean
+    BoardDetails:
+      properties:
+        cells:
+          type: array
+          items:
+            type: array
+            items:
+              type: integer
+        stringRepresentation:
+          type: string
+    PlayerMoveType:
+      type: string
+      enum: [reveal, redFlag, questionMark, clearFlag]
+    Coordinates:
+      type: object
+      properties:
+        row:
+          type: integer
+          minimum: 0
+          maximum: 20
+        column:
+          type: integer
+          minimum: 0
+          maximum: 20
+    PlayerMove:
+      properties:
+        moveType:
+          $ref: '#/components/schemas/PlayerMoveType'
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'

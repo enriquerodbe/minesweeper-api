@@ -6,30 +6,32 @@
 #   content:
 #      application/json:
 #        schema:
-#          $ref: '#/components/schemas/user.dto.UserCredentials'
+#          $ref: '#/components/schemas/Credentials'
 # responses:
 #   204:
-#     description: User successfuly registered
+#     description: Successfuly registered
 #   400:
 #     description: Invalid input data
 #   409:
 #     description: User already registered
 ###
-POST  /    user.UserController.register()
+POST  /    auth.AuthController.register()
 
 ###
 # summary: User login
 # requestBody:
-#   description: The user data for logging in
+#   description: The credentials for logging in
 #   required: true
 #   content:
 #      application/json:
 #        schema:
-#          $ref: '#/components/schemas/user.dto.UserCredentials'
+#          $ref: '#/components/schemas/Credentials'
 # responses:
 #   204:
-#     description: User successfuly logged in
+#     description: Successfuly logged in
 #   400:
 #     description: Invalid input data
+#   401:
+#     description: Incorrect email or password
 ###
-POST  /login    user.UserController.login()
+POST  /login    auth.AuthController.login()

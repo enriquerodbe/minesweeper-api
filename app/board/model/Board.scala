@@ -61,6 +61,10 @@ case class Board(
   def isFinished: Boolean = cells.forall(_.forall(_.isCorrect))
 
   def isGameOver: Boolean = isExploded || isFinished
+
+  def stringRepresentation: String = {
+    cells.map(_.map(_.toCodeString).mkString).mkString("\n")
+  }
 }
 
 object Board {
