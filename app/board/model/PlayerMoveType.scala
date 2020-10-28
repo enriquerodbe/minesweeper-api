@@ -5,6 +5,6 @@ object PlayerMoveType extends Enumeration {
 
   val Reveal = Value("reveal")
   val RedFlag = Value("redFlag")
-  val questionMark = Value("questionMark")
-  val clearFlag = Value("clearFlag")
+  val QuestionMark = Value("questionMark")
+  val ClearFlag = Value("clearFlag")
 }

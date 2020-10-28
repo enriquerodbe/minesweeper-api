@@ -1,37 +1,54 @@
 package board
 
+import akka.actor.ActorRef
+import akka.pattern.ask
+import akka.util.Timeout
 import board.BoardSerializers._
 import board.model.BoardStatus.BoardStatus
-import board.model.{BoardConfiguration, PlayerMove}
-import javax.inject.{Inject, Singleton}
+import board.model.{Board, BoardConfiguration, PlayerMove}
+import javax.inject.{Inject, Named, Singleton}
+import play.api.libs.json.{Json, Writes}
 import play.api.libs.json.Json.toJson
-import play.api.mvc.{BaseController, ControllerComponents}
+import play.api.mvc.{BaseController, ControllerComponents, Result}
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.DurationInt
 
 @Singleton
 class BoardController @Inject()(
     val controllerComponents: ControllerComponents,
-    boardService: BoardService)(
+    @Named("boardService") boardService: ActorRef)(
     implicit ec: ExecutionContext)
   extends BaseController {
 
+  implicit val timeout: Timeout = 2.seconds
+  val FixedOwnerId = "test"
+
   def create() = Action.async(parse.json[BoardConfiguration]) { request =>
-    boardService.create(request.body).map(toJson(_)(boardSummaryWrites)).map(Created(_))
+    val futureResponse = boardService ? BoardService.CreateBoard(FixedOwnerId, request.body)
+    futureResponse.mapTo[Board].map(toJson(_)(boardSummaryWrites)).map(Created(_))
   }
 
   def retrieveAll() = Action.async {
-    boardService.retrieveAll().map(toJson(_)(bardSummarySeqWrites)).map(Ok(_))
+    val futureResponse = boardService ? BoardService.RetrieveAll(FixedOwnerId)
+    futureResponse.mapTo[Seq[Board]].map(toJson(_)(bardSummarySeqWrites)).map(Ok(_))
   }
 
   def retrieve(boardUid: String) = Action.async {
-    boardService.retrieve(boardUid).map(toJson(_)(boardDetailsWrites)).map(Ok(_))
+    val futureResponse = boardService ? BoardService.Retrieve(FixedOwnerId, boardUid)
+    futureResponse.mapTo[Option[Board]].map(maybeBoardToResult(_)(boardDetailsWrites))
   }
 
   def move(boardUid: String) = Action.async(parse.json[PlayerMove]) { request =>
-    boardService.move(boardUid, request.body).map(toJson(_)(boardDetailsWrites)).map(Ok(_))
+    val futureResponse = boardService ? BoardService.Move(FixedOwnerId, boardUid, request.body)
+    futureResponse.mapTo[Option[Board]].map(maybeBoardToResult(_)(boardDetailsWrites))
   }
 
   def changeStatus(boardUid: String) = Action.async(parse.json[BoardStatus]) { request =>
-    boardService.changeStatus(boardUid, request.body).map(toJson(_)(boardSummaryWrites)).map(Ok(_))
+    val futureResponse = boardService ? BoardService.ChangeStatus(FixedOwnerId, boardUid, request.body)
+    futureResponse.mapTo[Option[Board]].map(maybeBoardToResult(_)(boardSummaryWrites))
+  }
+
+  private def maybeBoardToResult(maybeBoard: Option[Board])(writes: Writes[Board]): Result = {
+    maybeBoard.map(Json.toJson(_)(writes)).fold(NoContent)(Ok(_))
   }
 }

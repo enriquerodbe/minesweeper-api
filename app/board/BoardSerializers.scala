@@ -15,7 +15,7 @@ object BoardSerializers {
     (__ \ "mines").read[Int](min(1))
   )(BoardConfiguration.apply _)
 
-  implicit val boardSummaryWrites: Writes[Board] = Writes { board =>
+  val boardSummaryWrites: Writes[Board] = Writes { board =>
     Json.obj(
       "uid" -> board.uid,
       "rows" -> board.configuration.numRows,
@@ -26,9 +26,11 @@ object BoardSerializers {
     )
   }
 
-  implicit val bardSummarySeqWrites: Writes[Seq[Board]] = Writes { b => Json.toJson(b) }
+  val bardSummarySeqWrites: Writes[Seq[Board]] = Writes { b =>
+    JsArray(b.map(Json.toJson(_)(boardSummaryWrites)))
+  }
 
-  implicit val boardDetailsWrites: Writes[Board] = Writes { board =>
+  val boardDetailsWrites: Writes[Board] = Writes { board =>
     Json.obj(
       "cells" -> board.cells.map(_.map(_.toCodeNumber)),
       "stringRepresentation" -> board.stringRepresentation
