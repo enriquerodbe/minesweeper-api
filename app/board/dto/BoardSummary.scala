@@ -1,6 +1,6 @@
 package board.dto
 
-import board.dto.BoardStatus.BoardStatus
+import board.model.BoardStatus.BoardStatus
 
 case class BoardSummary(
     uid: String,

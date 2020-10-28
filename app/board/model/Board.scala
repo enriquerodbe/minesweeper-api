@@ -1,6 +1,12 @@
 package board.model
 
-case class Board(cells: IndexedSeq[IndexedSeq[Cell]], configuration: BoardConfiguration) {
+import board.model.BoardStatus.BoardStatus
+
+case class Board(
+    uid: String,
+    configuration: BoardConfiguration,
+    cells: IndexedSeq[IndexedSeq[Cell]],
+    status: BoardStatus) {
 
   def revealed(coordinates: Coordinates): Board = {
     val cell = readCell(coordinates)

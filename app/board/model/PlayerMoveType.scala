@@ -1,4 +1,4 @@
-package board.dto
+package board.model
 
 object PlayerMoveType extends Enumeration {
   type PlayerMoveType = Value

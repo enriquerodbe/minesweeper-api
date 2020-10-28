@@ -1,5 +1,5 @@
-package board.dto
+package board.model
 
-import board.dto.PlayerMoveType.PlayerMoveType
+import board.model.PlayerMoveType.PlayerMoveType
 
 case class PlayerMove(moveType: PlayerMoveType, coordinates: Coordinates)

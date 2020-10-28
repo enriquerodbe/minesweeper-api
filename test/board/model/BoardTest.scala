@@ -1,13 +1,12 @@
-package model
+package board.model
 
-import board.model.Board
-import model.Generators.{boardConfigGen, gameGen}
+import board.model.Generators.{boardConfigGen, gameGen}
 import org.scalacheck.Prop.{forAll, propBoolean}
 import org.scalacheck.Properties
 
 class BoardTest extends Properties("Board") {
 
-  def cheat(initialBoard: Board): Board = {
+  private def cheat(initialBoard: Board): Board = {
     initialBoard.cells.flatten.foldLeft(initialBoard) { case (board, cell) =>
       if (cell.hasMine) board.redFlagged(cell.coordinates)
       else board.revealed(cell.coordinates)

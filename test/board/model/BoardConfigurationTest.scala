@@ -1,7 +1,6 @@
-package model
+package board.model
 
-import board.model.Coordinates
-import model.Generators._
+import board.model.Generators._
 import org.scalacheck.Prop.{all, forAll, propBoolean}
 import org.scalacheck.Properties
 

@@ -11,7 +11,7 @@ case class BoardConfiguration(numRows: Int, numColumns: Int, numMines: Int) {
   def generateRandomBoard(): Board = {
     val mines = Random.shuffle((0 until size).toSet).take(numMines)
     val cells = IndexedSeq.tabulate(numRows, numColumns)(generateCell(_, _, mines))
-    new Board(cells, this)
+    new Board(generateUid(), this, cells, BoardStatus.Playing)
   }
 
   private def generateCell(row: Int, column: Int, mines: Set[Int]): Cell = {
@@ -23,6 +23,8 @@ case class BoardConfiguration(numRows: Int, numColumns: Int, numMines: Int) {
       CellStatus.Covered,
     )
   }
+
+  private def generateUid(): String = Random.alphanumeric.take(6).mkString
 
   private def hasMine(coordinates: Coordinates, mines: Set[Int]): Boolean = {
     mines.contains(coordinates.row * numColumns + coordinates.column)

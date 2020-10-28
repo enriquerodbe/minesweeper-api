@@ -1,4 +1,4 @@
-package board.dto
+package board.model
 
 object BoardStatus extends Enumeration {
   type BoardStatus = Value

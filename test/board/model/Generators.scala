@@ -1,6 +1,5 @@
-package model
+package board.model
 
-import board.model.{Board, BoardConfiguration, Coordinates}
 import org.scalacheck.Gen
 
 object Generators {
