@@ -1,6 +1,8 @@
 package board.model
 
+import board.model.BoardException.PlayerMoveOutOfBounds
 import board.model.BoardStatus.BoardStatus
+import scala.util.{Failure, Success, Try}
 
 case class Board(
     uid: String,
@@ -64,6 +66,27 @@ case class Board(
 
   def stringRepresentation: String = {
     cells.map(_.map(_.toCodeString).mkString).mkString("\n")
+  }
+
+  def tryMakeMove(playerMove: PlayerMove): Try[Board] = {
+    if (areCoordinatesOutOfBounds(playerMove.coordinates)) {
+      Failure(PlayerMoveOutOfBounds(playerMove.coordinates, configuration))
+    } else {
+      Success(makeMove(playerMove))
+    }
+  }
+
+  private def areCoordinatesOutOfBounds(coordinates: Coordinates): Boolean = {
+    val Coordinates(row, column) = coordinates
+    row < 0 || row > configuration.lastRowIndex ||
+    column < 0 || column > configuration.lastColumnIndex
+  }
+
+  private def makeMove(playerMove: PlayerMove): Board = playerMove.moveType match {
+    case PlayerMoveType.Reveal => revealed(playerMove.coordinates)
+    case PlayerMoveType.RedFlag => redFlagged(playerMove.coordinates)
+    case PlayerMoveType.QuestionMark => questionMarked(playerMove.coordinates)
+    case PlayerMoveType.ClearFlag => flagCleared(playerMove.coordinates)
   }
 }
 

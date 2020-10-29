@@ -2,35 +2,60 @@ package board
 
 import akka.actor.{Actor, ActorRef, Props}
 import board.BoardService._
+import board.model.BoardException._
 import board.model.BoardStatus.BoardStatus
 import board.model.{BoardConfiguration, PlayerMove}
 import javax.inject.Inject
+import play.api.Configuration
+import scala.util.{Failure, Success, Try}
 
-class BoardService @Inject() extends Actor {
+class BoardService @Inject()(configuration: Configuration) extends Actor {
+
+  val MinBoardSize = configuration.get[Int]("board.config.size.min")
+  val MaxBoardSize = configuration.get[Int]("board.config.size.max")
+  val MinBoardMines = configuration.get[Int]("board.config.mines.min")
 
   override def receive: Receive = {
     case CreateBoard(ownerUid, config) =>
-      getOrCreate(ownerUid).tell(BoardActor.Initialize(config), sender())
+      validateBoardConfig(config) match {
+        case Success(config) =>
+          getOrCreate(ownerUid).tell(Player.Initialize(config), sender())
+        case Failure(ex) =>
+          sender() ! akka.actor.Status.Failure(ex)
+      }
 
     case RetrieveAll(ownerUid) =>
-      getOrCreate(ownerUid).tell(BoardActor.RetrieveAll, sender())
+      getOrCreate(ownerUid).tell(Player.RetrieveAll, sender())
 
     case Retrieve(ownerUid, boardUid) =>
-      getOrCreate(ownerUid).tell(BoardActor.Retrieve(boardUid), sender())
+      getOrCreate(ownerUid).tell(Player.Retrieve(boardUid), sender())
 
     case Move(ownerUid, boardUid, move) =>
-      getOrCreate(ownerUid).tell(BoardActor.Move(boardUid, move), sender())
+      getOrCreate(ownerUid).tell(Player.Move(boardUid, move), sender())
 
     case ChangeStatus(ownerUid, boardUid, newStatus) =>
-      getOrCreate(ownerUid).tell(BoardActor.ChangeStatus(boardUid, newStatus), sender())
+      getOrCreate(ownerUid).tell(Player.ChangeStatus(boardUid, newStatus), sender())
   }
 
   private def getOrCreate(ownerUid: String): ActorRef = {
     val name = makeActorName(ownerUid)
-    context.child(name).getOrElse(context.actorOf(Props(new BoardActor), name))
+    context.child(name).getOrElse(context.actorOf(Props(new Player), name))
   }
 
   private def makeActorName(ownerUid: String): String = s"player-$ownerUid"
+
+  private def validateBoardConfig(config: BoardConfiguration): Try[BoardConfiguration] = {
+    if (config.size < MinBoardSize) {
+      Failure(BoardSizeTooSmall(config.size, MinBoardSize))
+    } else if (config.size > MaxBoardSize) {
+      Failure(BoardSizeTooBig(config.size, MaxBoardSize))
+    } else if (config.numMines < MinBoardMines) {
+      Failure(BoardTooFewMines(config.numMines, MinBoardMines))
+    } else if (config.numMines >= config.size) {
+      Failure(BoardTooManyMines(config.numMines, config.size))
+    }
+    else Success(config)
+  }
 }
 
 object BoardService {

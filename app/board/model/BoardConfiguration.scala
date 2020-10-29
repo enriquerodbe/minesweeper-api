@@ -9,7 +9,7 @@ case class BoardConfiguration(numRows: Int, numColumns: Int, numMines: Int) {
   val size: Int = numRows * numColumns
 
   def generateRandomBoard(): Board = {
-    val mines = Seq.fill(numMines)(Random.nextInt(size)).toSet
+    val mines = Random.shuffle(Seq.from(0 until size)).take(numMines).toSet
     val cells = IndexedSeq.tabulate(numRows, numColumns)(generateCell(_, _, mines))
     new Board(generateUid(), this, cells, BoardStatus.Playing)
   }

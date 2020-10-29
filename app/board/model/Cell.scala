@@ -1,5 +1,6 @@
 package board.model
 
+import board.model.Cell._
 import board.model.CellStatus.CellStatus
 
 case class Cell(
@@ -30,15 +31,15 @@ case class Cell(
   def isExploded: Boolean = hasMine && isRevealed
 
   def toCodeNumber: Int = {
-    if (isExploded) -1
+    if (isExploded) CodeExploded
     else if (isRevealed) adjacentMines // 0 to 8
-    else if (isRedFlagged) 9
-    else if (isQuestionMarked) 10
-    else 11 // covered
+    else if (isRedFlagged) CodeRedFlagged
+    else if (isQuestionMarked) CodeQuestionMarked
+    else CodeCovered
   }
 
   def toCodeString: String = toCodeNumber match {
-    case -1 => "💥"
+    case CodeExploded => "💥"
     case 0 => "⬜️"
     case 1 => "1️⃣"
     case 2 => "2️⃣"
@@ -48,8 +49,16 @@ case class Cell(
     case 6 => "6️⃣"
     case 7 => "7️⃣"
     case 8 => "8️⃣"
-    case 9 => "🚩"
-    case 10 => "❓"
-    case 11 => "⬛️"
+    case CodeRedFlagged => "🚩"
+    case CodeQuestionMarked => "❓"
+    case CodeCovered => "⬛️"
   }
+}
+
+object Cell {
+
+  val CodeExploded = -1
+  val CodeRedFlagged = 9
+  val CodeQuestionMarked = 10
+  val CodeCovered = 11
 }

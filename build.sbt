@@ -9,7 +9,10 @@ scalaVersion := "2.13.3"
 
 libraryDependencies += guice
 
-libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.14.1" % Test
+libraryDependencies ++= Seq(
+  "org.scalacheck" %% "scalacheck" % "1.14.1",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0",
+).map(_ % Test)
 
 // play-swagger
 swaggerDomainNameSpaces := Seq("placeholder") // Doesn't work without this
@@ -19,6 +22,7 @@ swaggerV3 := true
 play.sbt.routes.RoutesKeys.routesImport := Seq.empty
 
 // Scoverage
+coverageEnabled := true
 coverageMinimum := 90
 coverageFailOnMinimum := true
 coverageExcludedPackages := Seq(

@@ -7,9 +7,8 @@ import board.BoardSerializers._
 import board.model.BoardStatus.BoardStatus
 import board.model.{Board, BoardConfiguration, PlayerMove}
 import javax.inject.{Inject, Named, Singleton}
-import play.api.libs.json.{Json, Writes}
 import play.api.libs.json.Json.toJson
-import play.api.mvc.{BaseController, ControllerComponents, Result}
+import play.api.mvc.{BaseController, ControllerComponents}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 
@@ -35,20 +34,16 @@ class BoardController @Inject()(
 
   def retrieve(boardUid: String) = Action.async {
     val futureResponse = boardService ? BoardService.Retrieve(FixedOwnerId, boardUid)
-    futureResponse.mapTo[Option[Board]].map(maybeBoardToResult(_)(boardDetailsWrites))
+    futureResponse.mapTo[Board].map(toJson(_)(boardDetailsWrites)).map(Ok(_))
   }
 
   def move(boardUid: String) = Action.async(parse.json[PlayerMove]) { request =>
     val futureResponse = boardService ? BoardService.Move(FixedOwnerId, boardUid, request.body)
-    futureResponse.mapTo[Option[Board]].map(maybeBoardToResult(_)(boardDetailsWrites))
+    futureResponse.mapTo[Board].map(toJson(_)(boardDetailsWrites)).map(Ok(_))
   }
 
   def changeStatus(boardUid: String) = Action.async(parse.json[BoardStatus]) { request =>
     val futureResponse = boardService ? BoardService.ChangeStatus(FixedOwnerId, boardUid, request.body)
-    futureResponse.mapTo[Option[Board]].map(maybeBoardToResult(_)(boardSummaryWrites))
-  }
-
-  private def maybeBoardToResult(maybeBoard: Option[Board])(writes: Writes[Board]): Result = {
-    maybeBoard.map(Json.toJson(_)(writes)).fold(NoContent)(Ok(_))
+    futureResponse.mapTo[Board].map(toJson(_)(boardSummaryWrites)).map(Ok(_))
   }
 }

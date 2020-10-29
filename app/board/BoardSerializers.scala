@@ -4,15 +4,14 @@ import board.model.BoardStatus.BoardStatus
 import board.model.PlayerMoveType.PlayerMoveType
 import board.model._
 import play.api.libs.functional.syntax._
-import play.api.libs.json.Reads.{max, min}
 import play.api.libs.json._
 
 object BoardSerializers {
 
   implicit val boardConfigurationReads: Reads[BoardConfiguration] = (
-    (__ \ "rows").read[Int](min(2) andKeep max(20)) and
-    (__ \ "columns").read[Int](min(2) andKeep max(20)) and
-    (__ \ "mines").read[Int](min(1))
+    (__ \ "rows").read[Int] and
+    (__ \ "columns").read[Int] and
+    (__ \ "mines").read[Int]
   )(BoardConfiguration.apply _)
 
   val boardSummaryWrites: Writes[Board] = Writes { board =>
