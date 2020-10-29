@@ -1,3 +1,5 @@
+import play.core.PlayVersion.akkaVersion
+
 name := """minesweeper-api"""
 organization := "quique"
 
@@ -7,7 +9,12 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala, SwaggerPlugin)
 
 scalaVersion := "2.13.3"
 
-libraryDependencies += guice
+libraryDependencies ++= Seq(
+  guice,
+  "com.typesafe.akka" %% "akka-persistence" % akkaVersion,
+  "com.typesafe.akka" %% "akka-serialization-jackson" % akkaVersion,
+  "org.fusesource.leveldbjni" % "leveldbjni-all" % "1.8",
+)
 
 libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.14.1",

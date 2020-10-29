@@ -1,56 +1,85 @@
 package game
 
-import akka.actor.Actor
+import akka.actor.Props
+import akka.persistence.PersistentActor
+import com.fasterxml.jackson.module.scala.JsonScalaEnumeration
 import game.Player._
 import game.model.BoardException.BoardUidNotFound
 import game.model.BoardStatus.BoardStatus
 import game.model._
 import scala.util.{Failure, Success, Try}
 
-class Player extends Actor {
+class Player(playerUid: String) extends PersistentActor {
 
   var boards = Map.empty[String, Board]
 
-  override def receive: Receive = {
-    case Initialize(config) =>
-      handleBoardResult(Success(config.generateRandomBoard()))
+  override val persistenceId: String = playerUid
+
+  override def receiveCommand: Receive = {
+    case CreateBoard(config) =>
+      updateState(BoardCreated(config.generateRandomBoard()))
 
     case Move(uid, playerMove) =>
-      val newBoard = getBoard(uid).flatMap(_.tryMakeMove(playerMove))
-      handleBoardResult(newBoard)
+      updateState(Moved(uid, playerMove))
 
-    case ChangeStatus(uid, newStatus) =>
-      val newBoard = getBoard(uid).map(_.copy(status = newStatus))
-      handleBoardResult(newBoard)
+    case ChangeBoardStatus(uid, newStatus) =>
+      updateState(BoardStatusChanged(uid, newStatus))
 
-    case Retrieve(uid) =>
-      handleBoardResult(getBoard(uid))
+    case RetrieveBoard(uid) =>
+      getBoard(uid) match {
+        case Success(board) => sender() ! board
+        case Failure(ex) => sender() ! akka.actor.Status.Failure(ex)
+      }
 
-    case RetrieveAll =>
+    case RetrieveAllBoards =>
       sender() ! boards.values.toSeq
+  }
+
+  private def updateState(event: Event): Unit = {
+    updateStateRecover(event) match {
+      case Success(board) => persist(event)(_ => sender() ! board)
+      case Failure(ex) => sender() ! akka.actor.Status.Failure(ex)
+    }
+  }
+
+  private def updateStateRecover(event: Event): Try[Board] = {
+    val newBoard = event match {
+      case BoardCreated(board) =>
+        Success(board)
+      case Moved(boardUid, movement) =>
+        getBoard(boardUid).flatMap(_.tryMakeMove(movement))
+      case BoardStatusChanged(boardUid, newStatus) =>
+        getBoard(boardUid).map(_.copy(status = newStatus))
+    }
+    newBoard.foreach(b => boards += b.uid -> b)
+    newBoard
   }
 
   private def getBoard(uid: String): Try[Board] = {
     boards.get(uid).fold[Try[Board]](Failure(BoardUidNotFound(uid)))(Success(_))
   }
 
-  private def handleBoardResult(newBoard: Try[Board]): Unit = {
-    newBoard match {
-      case Success(board) =>
-        boards += board.uid -> board
-        sender() ! board
-      case Failure(ex) =>
-        sender() ! akka.actor.Status.Failure(ex)
-    }
+  override def receiveRecover: Receive = {
+    case event: Event => val _ = updateStateRecover(event)
   }
 }
 
+sealed trait Event
+
 object Player {
 
+  def props(playerUid: String): Props = Props(new Player(playerUid))
+
   sealed trait Command
-  case class Initialize(config: BoardConfiguration) extends Command
+  case class CreateBoard(config: BoardConfiguration) extends Command
   case class Move(boardUid: String, movement: PlayerMove) extends Command
-  case class ChangeStatus(boardUid: String, newStatus: BoardStatus) extends Command
-  case class Retrieve(boardUid: String) extends Command
-  case object RetrieveAll extends Command
+  case class ChangeBoardStatus(boardUid: String, newStatus: BoardStatus) extends Command
+  case class RetrieveBoard(boardUid: String) extends Command
+  case object RetrieveAllBoards extends Command
+
+  case class BoardCreated(board: Board) extends Event
+  case class Moved(boardUid: String, movement: PlayerMove) extends Event
+  case class BoardStatusChanged(
+      boardUid: String,
+      @JsonScalaEnumeration(classOf[BoardStatusType]) newStatus: BoardStatus) extends Event
 }

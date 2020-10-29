@@ -1,5 +1,6 @@
 package game.model
 
+import com.fasterxml.jackson.module.scala.JsonScalaEnumeration
 import game.model.BoardException.PlayerMoveOutOfBounds
 import game.model.BoardStatus.BoardStatus
 import scala.util.{Failure, Success, Try}
@@ -8,7 +9,7 @@ case class Board(
     uid: String,
     configuration: BoardConfiguration,
     cells: IndexedSeq[IndexedSeq[Cell]],
-    status: BoardStatus) {
+    @JsonScalaEnumeration(classOf[BoardStatusType]) status: BoardStatus) {
 
   def revealed(coordinates: Coordinates): Board = {
     val cell = readCell(coordinates)

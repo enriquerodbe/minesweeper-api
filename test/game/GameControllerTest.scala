@@ -2,13 +2,11 @@ package game
 
 import game.model.BoardException._
 import game.model._
-import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.JsValue
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class GameControllerTest extends PlaySpec with GuiceOneAppPerSuite {
+class GameControllerTest extends BaseControllerTest {
 
   val controller = app.injector.instanceOf[GameController]
 

@@ -1,6 +1,6 @@
 package game
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{Actor, ActorRef, Status}
 import game.GameService._
 import game.model.BoardException._
 import game.model.BoardStatus.BoardStatus
@@ -19,27 +19,27 @@ class GameService @Inject()(configuration: Configuration) extends Actor {
     case CreateBoard(ownerUid, config) =>
       validateBoardConfig(config) match {
         case Success(config) =>
-          getOrCreate(ownerUid).tell(Player.Initialize(config), sender())
+          getOrCreate(ownerUid).tell(Player.CreateBoard(config), sender())
         case Failure(ex) =>
-          sender() ! akka.actor.Status.Failure(ex)
+          sender() ! Status.Failure(ex)
       }
 
     case RetrieveAllBoards(ownerUid) =>
-      getOrCreate(ownerUid).tell(Player.RetrieveAll, sender())
+      getOrCreate(ownerUid).tell(Player.RetrieveAllBoards, sender())
 
     case RetrieveBoard(ownerUid, boardUid) =>
-      getOrCreate(ownerUid).tell(Player.Retrieve(boardUid), sender())
+      getOrCreate(ownerUid).tell(Player.RetrieveBoard(boardUid), sender())
 
     case Move(ownerUid, boardUid, move) =>
       getOrCreate(ownerUid).tell(Player.Move(boardUid, move), sender())
 
     case ChangeBoardStatus(ownerUid, boardUid, newStatus) =>
-      getOrCreate(ownerUid).tell(Player.ChangeStatus(boardUid, newStatus), sender())
+      getOrCreate(ownerUid).tell(Player.ChangeBoardStatus(boardUid, newStatus), sender())
   }
 
   private def getOrCreate(ownerUid: String): ActorRef = {
     val name = makeActorName(ownerUid)
-    context.child(name).getOrElse(context.actorOf(Props(new Player), name))
+    context.child(name).getOrElse(context.actorOf(Player.props(ownerUid), name))
   }
 
   private def makeActorName(ownerUid: String): String = s"player-$ownerUid"

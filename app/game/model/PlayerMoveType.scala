@@ -1,5 +1,7 @@
 package game.model
 
+import com.fasterxml.jackson.core.`type`.TypeReference
+
 object PlayerMoveType extends Enumeration {
   type PlayerMoveType = Value
 
@@ -8,3 +10,5 @@ object PlayerMoveType extends Enumeration {
   val QuestionMark = Value("questionMark")
   val ClearFlag = Value("clearFlag")
 }
+
+class PlayerMoveTypeType extends TypeReference[PlayerMoveType.type]

@@ -1,5 +1,6 @@
 package game.model
 
+import com.fasterxml.jackson.module.scala.JsonScalaEnumeration
 import game.model.Cell._
 import game.model.CellStatus.CellStatus
 
@@ -7,7 +8,7 @@ case class Cell(
     coordinates: Coordinates,
     hasMine: Boolean,
     adjacentMines: Int,
-    status: CellStatus,
+    @JsonScalaEnumeration(classOf[CellStatusType]) status: CellStatus,
 ) {
 
   def revealed(): Cell = copy(status = CellStatus.Revealed)
