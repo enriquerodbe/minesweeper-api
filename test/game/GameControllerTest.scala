@@ -22,7 +22,7 @@ class GameControllerTest extends BaseControllerTest {
       (jsonResult \ "rows").as[Int] mustEqual 10
       (jsonResult \ "columns").as[Int] mustEqual 11
       (jsonResult \ "mines").as[Int] mustEqual 12
-      (jsonResult \ "status").as[String] mustEqual "active"
+      (jsonResult \ "isActive").as[Boolean] mustEqual true
       (jsonResult \ "isGameOver").as[Boolean] mustEqual false
     }
 
@@ -67,7 +67,7 @@ class GameControllerTest extends BaseControllerTest {
       (jsonResult.head \ "rows").as[Int] mustEqual 10
       (jsonResult.head \ "columns").as[Int] mustEqual 11
       (jsonResult.head \ "mines").as[Int] mustEqual 12
-      (jsonResult.head \ "status").as[String] mustEqual "active"
+      (jsonResult.head \ "isActive").as[Boolean] mustEqual true
       (jsonResult.head \ "isGameOver").as[Boolean] mustEqual false
     }
 
@@ -138,25 +138,25 @@ class GameControllerTest extends BaseControllerTest {
     "set preserved status" in {
       val createdUid = createBoard()
 
-      val result = controller.changeBoardStatus(createdUid)(FakeRequest().withBody(BoardStatus.Preserved))
+      val result = controller.setBoardIsActive(createdUid)(FakeRequest().withBody(false))
 
       status(result) mustEqual OK
       val jsonResult = contentAsJson(result)
-      (jsonResult \ "status").as[String] mustEqual "preserved"
+      (jsonResult \ "isActive").as[Boolean] mustEqual false
     }
 
     "set active status" in {
       val createdUid = createBoard()
 
-      val result = controller.changeBoardStatus(createdUid)(FakeRequest().withBody(BoardStatus.Preserved))
+      val result = controller.setBoardIsActive(createdUid)(FakeRequest().withBody(false))
       status(result) mustEqual OK
 
-      val activeRequest = FakeRequest().withBody(BoardStatus.Active)
-      val resultActive = controller.changeBoardStatus(createdUid)(activeRequest)
+      val activeRequest = FakeRequest().withBody(true)
+      val resultActive = controller.setBoardIsActive(createdUid)(activeRequest)
 
       status(resultActive) mustEqual OK
       val jsonResult = contentAsJson(resultActive)
-      (jsonResult \ "status").as[String] mustEqual "active"
+      (jsonResult \ "isActive").as[Boolean] mustEqual true
     }
 
     "reject invalid move" when {

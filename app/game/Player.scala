@@ -2,10 +2,8 @@ package game
 
 import akka.actor.Props
 import akka.persistence.PersistentActor
-import com.fasterxml.jackson.module.scala.JsonScalaEnumeration
 import game.Player._
 import game.model.BoardException.BoardUidNotFound
-import game.model.BoardStatus.BoardStatus
 import game.model._
 import scala.util.{Failure, Success, Try}
 
@@ -22,8 +20,8 @@ class Player(playerUid: String) extends PersistentActor {
     case Move(uid, playerMove) =>
       updateState(Moved(uid, playerMove))
 
-    case ChangeBoardStatus(uid, newStatus) =>
-      updateState(BoardStatusChanged(uid, newStatus))
+    case SetIsActive(uid, isActive) =>
+      updateState(IsActiveSet(uid, isActive))
 
     case RetrieveBoard(uid) =>
       getBoard(uid) match {
@@ -48,8 +46,8 @@ class Player(playerUid: String) extends PersistentActor {
         Success(board)
       case Moved(boardUid, movement) =>
         getBoard(boardUid).flatMap(_.tryMakeMove(movement))
-      case BoardStatusChanged(boardUid, newStatus) =>
-        getBoard(boardUid).map(_.copy(status = newStatus))
+      case IsActiveSet(boardUid, newStatus) =>
+        getBoard(boardUid).map(_.activeSet(newStatus))
     }
     newBoard.foreach(b => boards += b.uid -> b)
     newBoard
@@ -73,13 +71,11 @@ object Player {
   sealed trait Command
   case class CreateBoard(config: BoardConfiguration) extends Command
   case class Move(boardUid: String, movement: PlayerMove) extends Command
-  case class ChangeBoardStatus(boardUid: String, newStatus: BoardStatus) extends Command
+  case class SetIsActive(boardUid: String, isActive: Boolean) extends Command
   case class RetrieveBoard(boardUid: String) extends Command
   case object RetrieveAllBoards extends Command
 
   case class BoardCreated(board: Board) extends Event
   case class Moved(boardUid: String, movement: PlayerMove) extends Event
-  case class BoardStatusChanged(
-      boardUid: String,
-      @JsonScalaEnumeration(classOf[BoardStatusType]) newStatus: BoardStatus) extends Event
+  case class IsActiveSet(boardUid: String, isActive: Boolean) extends Event
 }

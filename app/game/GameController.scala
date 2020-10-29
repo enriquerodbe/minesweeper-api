@@ -4,7 +4,6 @@ import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
 import game.BoardSerializers._
-import game.model.BoardStatus.BoardStatus
 import game.model.{Board, BoardConfiguration, PlayerMove}
 import javax.inject.{Inject, Named, Singleton}
 import play.api.libs.json.Json.toJson
@@ -42,8 +41,8 @@ class GameController @Inject()(
     futureResponse.mapTo[Board].map(toJson(_)(boardDetailsWrites)).map(Ok(_))
   }
 
-  def changeBoardStatus(boardUid: String) = Action.async(parse.json[BoardStatus]) { request =>
-    val futureResponse = gameService ? GameService.ChangeBoardStatus(FixedOwnerId, boardUid, request.body)
+  def setBoardIsActive(boardUid: String) = Action.async(parse.json[Boolean]) { request =>
+    val futureResponse = gameService ? GameService.SetIsActive(FixedOwnerId, boardUid, request.body)
     futureResponse.mapTo[Board].map(toJson(_)(boardSummaryWrites)).map(Ok(_))
   }
 }

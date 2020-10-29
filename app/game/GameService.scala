@@ -3,7 +3,6 @@ package game
 import akka.actor.{Actor, ActorRef, Status}
 import game.GameService._
 import game.model.BoardException._
-import game.model.BoardStatus.BoardStatus
 import game.model.{BoardConfiguration, PlayerMove}
 import javax.inject.Inject
 import play.api.Configuration
@@ -33,8 +32,8 @@ class GameService @Inject()(configuration: Configuration) extends Actor {
     case Move(ownerUid, boardUid, move) =>
       getOrCreate(ownerUid).tell(Player.Move(boardUid, move), sender())
 
-    case ChangeBoardStatus(ownerUid, boardUid, newStatus) =>
-      getOrCreate(ownerUid).tell(Player.ChangeBoardStatus(boardUid, newStatus), sender())
+    case SetIsActive(ownerUid, boardUid, newStatus) =>
+      getOrCreate(ownerUid).tell(Player.SetIsActive(boardUid, newStatus), sender())
   }
 
   private def getOrCreate(ownerUid: String): ActorRef = {
@@ -65,6 +64,6 @@ object GameService {
   case class RetrieveAllBoards(ownerUid: String) extends Command
   case class RetrieveBoard(ownerUid: String, boardUid: String) extends Command
   case class Move(ownerUid: String, boardUid: String, move: PlayerMove) extends Command
-  case class ChangeBoardStatus(
-      ownerUid: String, boardUid: String, newStatus: BoardStatus) extends Command
+  case class SetIsActive(
+      ownerUid: String, boardUid: String, isActive: Boolean) extends Command
 }

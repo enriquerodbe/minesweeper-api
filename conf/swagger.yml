@@ -26,9 +26,6 @@ components:
         mines:
           type: integer
           minimum: 1
-    BoardStatus:
-      type: string
-      enum: [ active, preserved ]
     BoardSummary:
       properties:
         uid:
@@ -39,8 +36,8 @@ components:
           type: integer
         mines:
           type: integer
-        status:
-          $ref: '#/components/schemas/BoardStatus'
+        isActive:
+          type: boolean
         isGameOver:
           type: boolean
     BoardDetails:

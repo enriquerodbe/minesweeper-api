@@ -11,6 +11,8 @@ object Generators {
       mines <- Gen.choose(1, rows*columns)
     } yield BoardConfiguration(rows, columns, mines)
 
+  def boardGen(maxSize: Int = 20): Gen[Board] = boardConfigGen(maxSize).map(_.generateRandomBoard())
+
   val coordinatesGen: Gen[(BoardConfiguration, Coordinates)] =
     for {
       boardConfig <- boardConfigGen()

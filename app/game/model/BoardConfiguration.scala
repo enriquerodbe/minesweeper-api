@@ -11,7 +11,7 @@ case class BoardConfiguration(numRows: Int, numColumns: Int, numMines: Int) {
   def generateRandomBoard(): Board = {
     val mines = Random.shuffle(Seq.from(0 until size)).take(numMines).toSet
     val cells = IndexedSeq.tabulate(numRows, numColumns)(generateCell(_, _, mines))
-    new Board(generateUid(), this, cells, BoardStatus.Active)
+    Board(generateUid(), this, cells)
   }
 
   private def generateCell(row: Int, column: Int, mines: Set[Int]): Cell = {

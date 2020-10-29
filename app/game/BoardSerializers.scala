@@ -1,6 +1,5 @@
 package game
 
-import game.model.BoardStatus.BoardStatus
 import game.model.PlayerMoveType.PlayerMoveType
 import game.model._
 import play.api.libs.functional.syntax._
@@ -20,8 +19,9 @@ object BoardSerializers {
       "rows" -> board.configuration.numRows,
       "columns" -> board.configuration.numColumns,
       "mines" -> board.configuration.numMines,
-      "status" -> board.status.toString,
+      "isActive" -> board.isActive,
       "isGameOver" -> board.isGameOver,
+      "timeSpent" -> board.timeSpent()
     )
   }
 
@@ -43,9 +43,4 @@ object BoardSerializers {
 
   implicit val coordinatesReads: Reads[Coordinates] = Json.reads[Coordinates]
   implicit val playerMoveReads: Reads[PlayerMove] = Json.reads[PlayerMove]
-
-  implicit val boardStatusReads: Reads[BoardStatus] = Reads {
-    case JsString(value) => JsSuccess(BoardStatus.withName(value))
-    case other => JsError(s"JsString expected for BoardStatus, got $other")
-  }
 }

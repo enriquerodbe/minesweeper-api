@@ -37,5 +37,5 @@ coverageExcludedPackages := Seq(
   "Reverse.*",
   "router",
   "authentication",
-  "game",
+  "games",
 ).mkString(";")

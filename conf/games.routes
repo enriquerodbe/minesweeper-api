@@ -71,14 +71,14 @@ GET  /:boardUid    game.GameController.retrieveBoard(boardUid: String)
 POST  /:boardUid/moves    game.GameController.move(boardUid: String)
 
 ###
-# summary: Change preserved/resumed board status
+# summary: Change preserved/active board status
 # requestBody:
-#   description: Current status
+#   description: Is active
 #   required: true
 #   content:
 #      application/json:
 #        schema:
-#          $ref: '#/components/schemas/BoardStatus'
+#          type: boolean
 # responses:
 #   200:
 #     description: Board details after status change
@@ -91,4 +91,4 @@ POST  /:boardUid/moves    game.GameController.move(boardUid: String)
 #   404:
 #     description: Board not found
 ###
-POST  /:boardUid/statuses    game.GameController.changeBoardStatus(boardUid: String)
+POST  /:boardUid/statuses    game.GameController.setBoardIsActive(boardUid: String)
