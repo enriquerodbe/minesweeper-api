@@ -28,7 +28,7 @@ components:
           minimum: 1
     BoardStatus:
       type: string
-      enum: [ playing, paused ]
+      enum: [ active, preserved ]
     BoardSummary:
       properties:
         uid:

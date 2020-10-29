@@ -1,4 +1,4 @@
-package board.model
+package game.model
 
 object PlayerMoveType extends Enumeration {
   type PlayerMoveType = Value

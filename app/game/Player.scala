@@ -1,10 +1,10 @@
-package board
+package game
 
 import akka.actor.Actor
-import board.Player._
-import board.model.BoardException.BoardUidNotFound
-import board.model.BoardStatus.BoardStatus
-import board.model._
+import game.Player._
+import game.model.BoardException.BoardUidNotFound
+import game.model.BoardStatus.BoardStatus
+import game.model._
 import scala.util.{Failure, Success, Try}
 
 class Player extends Actor {

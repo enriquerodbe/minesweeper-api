@@ -17,7 +17,7 @@
 #   400:
 #     description: Invalid input data
 ###
-POST  /    board.BoardController.create()
+POST  /    game.GameController.createBoard()
 
 ###
 # summary: Get all boards for the logged in user
@@ -31,7 +31,7 @@ POST  /    board.BoardController.create()
 #           items:
 #             $ref: '#/components/schemas/BoardSummary'
 ###
-GET  /    board.BoardController.retrieveAll()
+GET  /    game.GameController.retrieveAllBoards()
 
 ###
 # summary: Get details of a board
@@ -45,7 +45,7 @@ GET  /    board.BoardController.retrieveAll()
 #   404:
 #     description: Board not found
 ###
-GET  /:boardUid    board.BoardController.retrieve(boardUid: String)
+GET  /:boardUid    game.GameController.retrieveBoard(boardUid: String)
 
 ###
 # summary: Make a move
@@ -68,7 +68,7 @@ GET  /:boardUid    board.BoardController.retrieve(boardUid: String)
 #   404:
 #     description: Board not found
 ###
-POST  /:boardUid/moves    board.BoardController.move(boardUid: String)
+POST  /:boardUid/moves    game.GameController.move(boardUid: String)
 
 ###
 # summary: Change preserved/resumed board status
@@ -91,4 +91,4 @@ POST  /:boardUid/moves    board.BoardController.move(boardUid: String)
 #   404:
 #     description: Board not found
 ###
-POST  /:boardUid/statuses    board.BoardController.changeStatus(boardUid: String)
+POST  /:boardUid/statuses    game.GameController.changeBoardStatus(boardUid: String)

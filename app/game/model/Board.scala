@@ -1,7 +1,7 @@
-package board.model
+package game.model
 
-import board.model.BoardException.PlayerMoveOutOfBounds
-import board.model.BoardStatus.BoardStatus
+import game.model.BoardException.PlayerMoveOutOfBounds
+import game.model.BoardStatus.BoardStatus
 import scala.util.{Failure, Success, Try}
 
 case class Board(

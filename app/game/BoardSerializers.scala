@@ -1,8 +1,8 @@
-package board
+package game
 
-import board.model.BoardStatus.BoardStatus
-import board.model.PlayerMoveType.PlayerMoveType
-import board.model._
+import game.model.BoardStatus.BoardStatus
+import game.model.PlayerMoveType.PlayerMoveType
+import game.model._
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 

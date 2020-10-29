@@ -1,6 +1,6 @@
-package board.model
+package game.model
 
-import board.model.Generators.{boardConfigGen, gameGen}
+import game.model.Generators.{boardConfigGen, gameGen}
 import org.scalacheck.Prop.{forAll, propBoolean}
 import org.scalacheck.Properties
 

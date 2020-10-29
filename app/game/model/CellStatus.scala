@@ -1,4 +1,4 @@
-package board.model
+package game.model
 
 object CellStatus extends Enumeration {
   type CellStatus = Value

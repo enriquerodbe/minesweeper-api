@@ -1,22 +1,22 @@
-package board
+package game
 
-import board.model.BoardException._
-import board.model._
+import game.model.BoardException._
+import game.model._
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.libs.json.JsValue
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class BoardControllerTest extends PlaySpec with GuiceOneAppPerSuite {
+class GameControllerTest extends PlaySpec with GuiceOneAppPerSuite {
 
-  val controller = app.injector.instanceOf[BoardController]
+  val controller = app.injector.instanceOf[GameController]
 
   "BoardController" must {
     "create a new board" in {
       val request = FakeRequest().withBody(BoardConfiguration(10, 11, 12))
 
-      val result = controller.create()(request)
+      val result = controller.createBoard()(request)
 
       status(result) mustEqual CREATED
       val jsonResult = contentAsJson(result)
@@ -24,7 +24,7 @@ class BoardControllerTest extends PlaySpec with GuiceOneAppPerSuite {
       (jsonResult \ "rows").as[Int] mustEqual 10
       (jsonResult \ "columns").as[Int] mustEqual 11
       (jsonResult \ "mines").as[Int] mustEqual 12
-      (jsonResult \ "status").as[String] mustEqual "playing"
+      (jsonResult \ "status").as[String] mustEqual "active"
       (jsonResult \ "isGameOver").as[Boolean] mustEqual false
     }
 
@@ -32,35 +32,35 @@ class BoardControllerTest extends PlaySpec with GuiceOneAppPerSuite {
       "size is too big" in {
         val request = FakeRequest().withBody(BoardConfiguration(21, 32, 2))
 
-        val result = controller.create()(request)
+        val result = controller.createBoard()(request)
 
         intercept[BoardSizeTooBig](status(result))
       }
       "size is too small" in {
         val request = FakeRequest().withBody(BoardConfiguration(2, 1, 1))
 
-        val result = controller.create()(request)
+        val result = controller.createBoard()(request)
 
         intercept[BoardSizeTooSmall](status(result))
       }
       "too few mines" in {
         val request = FakeRequest().withBody(BoardConfiguration(10, 10, 0))
 
-        val result = controller.create()(request)
+        val result = controller.createBoard()(request)
 
         intercept[BoardTooFewMines](status(result))
       }
       "too many mines" in {
         val request = FakeRequest().withBody(BoardConfiguration(10, 10, 100))
 
-        val result = controller.create()(request)
+        val result = controller.createBoard()(request)
 
         intercept[BoardTooManyMines](status(result))
       }
     }
 
     "retrieve all boards" in {
-      val result = controller.retrieveAll()(FakeRequest())
+      val result = controller.retrieveAllBoards()(FakeRequest())
 
       status(result) mustEqual OK
       val jsonResult = contentAsJson(result).as[Seq[JsValue]]
@@ -69,14 +69,14 @@ class BoardControllerTest extends PlaySpec with GuiceOneAppPerSuite {
       (jsonResult.head \ "rows").as[Int] mustEqual 10
       (jsonResult.head \ "columns").as[Int] mustEqual 11
       (jsonResult.head \ "mines").as[Int] mustEqual 12
-      (jsonResult.head \ "status").as[String] mustEqual "playing"
+      (jsonResult.head \ "status").as[String] mustEqual "active"
       (jsonResult.head \ "isGameOver").as[Boolean] mustEqual false
     }
 
     "retrieve one board details" in {
       val createdUid = createBoard()
 
-      val result = controller.retrieve(createdUid)(FakeRequest())
+      val result = controller.retrieveBoard(createdUid)(FakeRequest())
 
       status(result) mustEqual OK
       val jsonResult = contentAsJson(result)
@@ -137,28 +137,28 @@ class BoardControllerTest extends PlaySpec with GuiceOneAppPerSuite {
       cells(1)(1) mustEqual Cell.CodeCovered
     }
 
-    "set paused status" in {
+    "set preserved status" in {
       val createdUid = createBoard()
 
-      val result = controller.changeStatus(createdUid)(FakeRequest().withBody(BoardStatus.Paused))
+      val result = controller.changeBoardStatus(createdUid)(FakeRequest().withBody(BoardStatus.Preserved))
 
       status(result) mustEqual OK
       val jsonResult = contentAsJson(result)
-      (jsonResult \ "status").as[String] mustEqual "paused"
+      (jsonResult \ "status").as[String] mustEqual "preserved"
     }
 
-    "set playing status" in {
+    "set active status" in {
       val createdUid = createBoard()
 
-      val result = controller.changeStatus(createdUid)(FakeRequest().withBody(BoardStatus.Paused))
+      val result = controller.changeBoardStatus(createdUid)(FakeRequest().withBody(BoardStatus.Preserved))
       status(result) mustEqual OK
 
-      val playingRequest = FakeRequest().withBody(BoardStatus.Playing)
-      val resultPlaying = controller.changeStatus(createdUid)(playingRequest)
+      val activeRequest = FakeRequest().withBody(BoardStatus.Active)
+      val resultActive = controller.changeBoardStatus(createdUid)(activeRequest)
 
-      status(resultPlaying) mustEqual OK
-      val jsonResult = contentAsJson(resultPlaying)
-      (jsonResult \ "status").as[String] mustEqual "playing"
+      status(resultActive) mustEqual OK
+      val jsonResult = contentAsJson(resultActive)
+      (jsonResult \ "status").as[String] mustEqual "active"
     }
 
     "reject invalid move" when {
@@ -199,6 +199,6 @@ class BoardControllerTest extends PlaySpec with GuiceOneAppPerSuite {
 
   private def createBoard() = {
     val requestBody = FakeRequest().withBody(BoardConfiguration(10, 10, 10))
-    (contentAsJson(controller.create()(requestBody)) \ "uid").as[String]
+    (contentAsJson(controller.createBoard()(requestBody)) \ "uid").as[String]
   }
 }

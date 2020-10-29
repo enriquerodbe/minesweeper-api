@@ -1,5 +1,5 @@
-package board.model
+package game.model
 
-import board.model.PlayerMoveType.PlayerMoveType
+import game.model.PlayerMoveType.PlayerMoveType
 
 case class PlayerMove(moveType: PlayerMoveType, coordinates: Coordinates)

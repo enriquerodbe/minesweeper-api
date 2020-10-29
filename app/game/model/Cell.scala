@@ -1,7 +1,7 @@
-package board.model
+package game.model
 
-import board.model.Cell._
-import board.model.CellStatus.CellStatus
+import game.model.Cell._
+import game.model.CellStatus.CellStatus
 
 case class Cell(
     coordinates: Coordinates,

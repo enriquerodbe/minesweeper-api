@@ -1,15 +1,15 @@
-package board
+package game
 
 import akka.actor.{Actor, ActorRef, Props}
-import board.BoardService._
-import board.model.BoardException._
-import board.model.BoardStatus.BoardStatus
-import board.model.{BoardConfiguration, PlayerMove}
+import game.GameService._
+import game.model.BoardException._
+import game.model.BoardStatus.BoardStatus
+import game.model.{BoardConfiguration, PlayerMove}
 import javax.inject.Inject
 import play.api.Configuration
 import scala.util.{Failure, Success, Try}
 
-class BoardService @Inject()(configuration: Configuration) extends Actor {
+class GameService @Inject()(configuration: Configuration) extends Actor {
 
   val MinBoardSize = configuration.get[Int]("board.config.size.min")
   val MaxBoardSize = configuration.get[Int]("board.config.size.max")
@@ -24,16 +24,16 @@ class BoardService @Inject()(configuration: Configuration) extends Actor {
           sender() ! akka.actor.Status.Failure(ex)
       }
 
-    case RetrieveAll(ownerUid) =>
+    case RetrieveAllBoards(ownerUid) =>
       getOrCreate(ownerUid).tell(Player.RetrieveAll, sender())
 
-    case Retrieve(ownerUid, boardUid) =>
+    case RetrieveBoard(ownerUid, boardUid) =>
       getOrCreate(ownerUid).tell(Player.Retrieve(boardUid), sender())
 
     case Move(ownerUid, boardUid, move) =>
       getOrCreate(ownerUid).tell(Player.Move(boardUid, move), sender())
 
-    case ChangeStatus(ownerUid, boardUid, newStatus) =>
+    case ChangeBoardStatus(ownerUid, boardUid, newStatus) =>
       getOrCreate(ownerUid).tell(Player.ChangeStatus(boardUid, newStatus), sender())
   }
 
@@ -58,12 +58,13 @@ class BoardService @Inject()(configuration: Configuration) extends Actor {
   }
 }
 
-object BoardService {
+object GameService {
 
   sealed trait Command
   case class CreateBoard(ownerUid: String, config: BoardConfiguration) extends Command
-  case class RetrieveAll(ownerUid: String) extends Command
-  case class Retrieve(ownerUid: String, boardUid: String) extends Command
+  case class RetrieveAllBoards(ownerUid: String) extends Command
+  case class RetrieveBoard(ownerUid: String, boardUid: String) extends Command
   case class Move(ownerUid: String, boardUid: String, move: PlayerMove) extends Command
-  case class ChangeStatus(ownerUid: String, boardUid: String, newStatus: BoardStatus) extends Command
+  case class ChangeBoardStatus(
+      ownerUid: String, boardUid: String, newStatus: BoardStatus) extends Command
 }
