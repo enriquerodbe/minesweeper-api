@@ -15,7 +15,9 @@
 #         schema:
 #           $ref: '#/components/schemas/BoardSummary'
 #   400:
-#     description: Invalid input data
+#     $ref: '#/components/responses/BadRequest'
+#   401:
+#     $ref: '#/components/responses/Unauthorized'
 ###
 POST  /    game.GameController.createBoard()
 
@@ -30,6 +32,8 @@ POST  /    game.GameController.createBoard()
 #           type: array
 #           items:
 #             $ref: '#/components/schemas/BoardSummary'
+#   401:
+#     $ref: '#/components/responses/Unauthorized'
 ###
 GET  /    game.GameController.retrieveAllBoards()
 
@@ -42,6 +46,8 @@ GET  /    game.GameController.retrieveAllBoards()
 #       application/json:
 #         schema:
 #           $ref: '#/components/schemas/BoardDetails'
+#   401:
+#     $ref: '#/components/responses/Unauthorized'
 #   404:
 #     description: Board not found
 ###
@@ -64,7 +70,9 @@ GET  /:boardUid    game.GameController.retrieveBoard(boardUid: String)
 #         schema:
 #           $ref: '#/components/schemas/BoardDetails'
 #   400:
-#     description: Invalid input data
+#     $ref: '#/components/responses/BadRequest'
+#   401:
+#     $ref: '#/components/responses/Unauthorized'
 #   404:
 #     description: Board not found
 ###
@@ -87,7 +95,9 @@ POST  /:boardUid/moves    game.GameController.move(boardUid: String)
 #         schema:
 #           $ref: '#/components/schemas/BoardSummary'
 #   400:
-#     description: Invalid input data
+#     $ref: '#/components/responses/BadRequest'
+#   401:
+#     $ref: '#/components/responses/Unauthorized'
 #   404:
 #     description: Board not found
 ###

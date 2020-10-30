@@ -1,5 +1,6 @@
 ###
 # summary: Register a new user
+# security: []
 # requestBody:
 #   description: The new user data
 #   required: true
@@ -8,10 +9,15 @@
 #        schema:
 #          $ref: '#/components/schemas/Credentials'
 # responses:
-#   204:
+#   201:
 #     description: Successfuly registered
+#     headers:
+#       X-Auth-Token:
+#         description: The auth token for subsequent requests
+#         schema:
+#           type: string
 #   400:
-#     description: Invalid input data
+#     $ref: '#/components/responses/BadRequest'
 #   409:
 #     description: User already registered
 ###
@@ -19,6 +25,7 @@ POST  /    auth.AuthController.register()
 
 ###
 # summary: User login
+# security: []
 # requestBody:
 #   description: The credentials for logging in
 #   required: true
@@ -29,9 +36,13 @@ POST  /    auth.AuthController.register()
 # responses:
 #   204:
 #     description: Successfuly logged in
+#     headers:
+#       X-Auth-Token:
+#         schema:
+#           type: string
 #   400:
-#     description: Invalid input data
+#     $ref: '#/components/responses/BadRequest'
 #   401:
-#     description: Incorrect email or password
+#     description: Invalid email or password
 ###
 POST  /login    auth.AuthController.login()

@@ -15,7 +15,7 @@ object BoardSerializers {
 
   val boardSummaryWrites: Writes[Board] = Writes { board =>
     Json.obj(
-      "uid" -> board.uid,
+      "uid" -> board.uid.value,
       "rows" -> board.configuration.numRows,
       "columns" -> board.configuration.numColumns,
       "mines" -> board.configuration.numMines,

@@ -2,16 +2,17 @@ package game
 
 import akka.actor.Props
 import akka.persistence.PersistentActor
+import auth.model.Email
 import game.Player._
 import game.model.BoardException.BoardUidNotFound
 import game.model._
 import scala.util.{Failure, Success, Try}
 
-class Player(playerUid: String) extends PersistentActor {
+class Player(player: Email) extends PersistentActor {
 
-  var boards = Map.empty[String, Board]
+  var boards = Map.empty[BoardUid, Board]
 
-  override val persistenceId: String = playerUid
+  override val persistenceId: String = player.value
 
   override def receiveCommand: Receive = {
     case CreateBoard(config) =>
@@ -53,7 +54,7 @@ class Player(playerUid: String) extends PersistentActor {
     newBoard
   }
 
-  private def getBoard(uid: String): Try[Board] = {
+  private def getBoard(uid: BoardUid): Try[Board] = {
     boards.get(uid).fold[Try[Board]](Failure(BoardUidNotFound(uid)))(Success(_))
   }
 
@@ -66,16 +67,16 @@ sealed trait Event
 
 object Player {
 
-  def props(playerUid: String): Props = Props(new Player(playerUid))
+  def props(player: Email): Props = Props(new Player(player))
 
   sealed trait Command
   case class CreateBoard(config: BoardConfiguration) extends Command
-  case class Move(boardUid: String, movement: PlayerMove) extends Command
-  case class SetIsActive(boardUid: String, isActive: Boolean) extends Command
-  case class RetrieveBoard(boardUid: String) extends Command
+  case class Move(boardUid: BoardUid, movement: PlayerMove) extends Command
+  case class SetIsActive(boardUid: BoardUid, isActive: Boolean) extends Command
+  case class RetrieveBoard(boardUid: BoardUid) extends Command
   case object RetrieveAllBoards extends Command
 
   case class BoardCreated(board: Board) extends Event
-  case class Moved(boardUid: String, movement: PlayerMove) extends Event
-  case class IsActiveSet(boardUid: String, isActive: Boolean) extends Event
+  case class Moved(boardUid: BoardUid, movement: PlayerMove) extends Event
+  case class IsActiveSet(boardUid: BoardUid, isActive: Boolean) extends Event
 }

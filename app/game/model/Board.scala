@@ -6,10 +6,10 @@ import java.time.{Duration, Instant}
 import scala.util.{Failure, Success, Try}
 
 case class Board(
-    uid: String,
+    uid: BoardUid,
     configuration: BoardConfiguration,
     cells: IndexedSeq[IndexedSeq[Cell]],
-    isActive: Boolean = true,
+    isActive: Boolean = false,
     currentTimeSpent: Duration = Duration.ZERO,
     resumedAt: Instant = Instant.now()) {
 

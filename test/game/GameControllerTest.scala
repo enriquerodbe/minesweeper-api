@@ -3,18 +3,16 @@ package game
 import game.model.BoardException._
 import game.model._
 import play.api.libs.json.JsValue
-import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import util.BaseControllerTest
 
 class GameControllerTest extends BaseControllerTest {
 
   val controller = app.injector.instanceOf[GameController]
 
-  "BoardController" must {
+  "GameController" must {
     "create a new board" in {
-      val request = FakeRequest().withBody(BoardConfiguration(10, 11, 12))
-
-      val result = controller.createBoard()(request)
+      val result = controller.createBoard()(fakeRequest().withBody(BoardConfiguration(10, 11, 12)))
 
       status(result) mustEqual CREATED
       val jsonResult = contentAsJson(result)
@@ -22,34 +20,34 @@ class GameControllerTest extends BaseControllerTest {
       (jsonResult \ "rows").as[Int] mustEqual 10
       (jsonResult \ "columns").as[Int] mustEqual 11
       (jsonResult \ "mines").as[Int] mustEqual 12
-      (jsonResult \ "isActive").as[Boolean] mustEqual true
+      (jsonResult \ "isActive").as[Boolean] mustEqual false
       (jsonResult \ "isGameOver").as[Boolean] mustEqual false
     }
 
     "reject invalid config" when {
       "size is too big" in {
-        val request = FakeRequest().withBody(BoardConfiguration(21, 32, 2))
+        val request = fakeRequest().withBody(BoardConfiguration(21, 32, 2))
 
         val result = controller.createBoard()(request)
 
         intercept[BoardSizeTooBig](status(result))
       }
       "size is too small" in {
-        val request = FakeRequest().withBody(BoardConfiguration(2, 1, 1))
+        val request = fakeRequest().withBody(BoardConfiguration(2, 1, 1))
 
         val result = controller.createBoard()(request)
 
         intercept[BoardSizeTooSmall](status(result))
       }
       "too few mines" in {
-        val request = FakeRequest().withBody(BoardConfiguration(10, 10, 0))
+        val request = fakeRequest().withBody(BoardConfiguration(10, 10, 0))
 
         val result = controller.createBoard()(request)
 
         intercept[BoardTooFewMines](status(result))
       }
       "too many mines" in {
-        val request = FakeRequest().withBody(BoardConfiguration(10, 10, 100))
+        val request = fakeRequest().withBody(BoardConfiguration(10, 10, 100))
 
         val result = controller.createBoard()(request)
 
@@ -58,7 +56,7 @@ class GameControllerTest extends BaseControllerTest {
     }
 
     "retrieve all boards" in {
-      val result = controller.retrieveAllBoards()(FakeRequest())
+      val result = controller.retrieveAllBoards()(fakeRequest())
 
       status(result) mustEqual OK
       val jsonResult = contentAsJson(result).as[Seq[JsValue]]
@@ -67,14 +65,14 @@ class GameControllerTest extends BaseControllerTest {
       (jsonResult.head \ "rows").as[Int] mustEqual 10
       (jsonResult.head \ "columns").as[Int] mustEqual 11
       (jsonResult.head \ "mines").as[Int] mustEqual 12
-      (jsonResult.head \ "isActive").as[Boolean] mustEqual true
+      (jsonResult.head \ "isActive").as[Boolean] mustEqual false
       (jsonResult.head \ "isGameOver").as[Boolean] mustEqual false
     }
 
     "retrieve one board details" in {
       val createdUid = createBoard()
 
-      val result = controller.retrieveBoard(createdUid)(FakeRequest())
+      val result = controller.retrieveBoard(createdUid)(fakeRequest())
 
       status(result) mustEqual OK
       val jsonResult = contentAsJson(result)
@@ -83,11 +81,17 @@ class GameControllerTest extends BaseControllerTest {
       all(cells) must have size 10
     }
 
+    "respond board not found" in {
+      val result = controller.retrieveBoard("uid-not-to-be-found")(fakeRequest())
+
+      intercept[BoardUidNotFound](status(result))
+    }
+
     "reveal cell" in {
       val createdUid = createBoard()
       val move = PlayerMove(PlayerMoveType.Reveal, Coordinates(1, 1))
 
-      val result = controller.move(createdUid)(FakeRequest().withBody(move))
+      val result = controller.move(createdUid)(fakeRequest().withBody(move))
 
       status(result) mustEqual OK
       val jsonResult = contentAsJson(result)
@@ -99,7 +103,7 @@ class GameControllerTest extends BaseControllerTest {
       val createdUid = createBoard()
       val move = PlayerMove(PlayerMoveType.RedFlag, Coordinates(1, 1))
 
-      val result = controller.move(createdUid)(FakeRequest().withBody(move))
+      val result = controller.move(createdUid)(fakeRequest().withBody(move))
 
       status(result) mustEqual OK
       val jsonResult = contentAsJson(result)
@@ -111,7 +115,7 @@ class GameControllerTest extends BaseControllerTest {
       val createdUid = createBoard()
       val move = PlayerMove(PlayerMoveType.QuestionMark, Coordinates(1, 1))
 
-      val result = controller.move(createdUid)(FakeRequest().withBody(move))
+      val result = controller.move(createdUid)(fakeRequest().withBody(move))
 
       status(result) mustEqual OK
       val jsonResult = contentAsJson(result)
@@ -124,10 +128,10 @@ class GameControllerTest extends BaseControllerTest {
       val redFlag = PlayerMove(PlayerMoveType.RedFlag, Coordinates(1, 1))
       val clearFlag = PlayerMove(PlayerMoveType.ClearFlag, Coordinates(1, 1))
 
-      val resultRedFlag = controller.move(createdUid)(FakeRequest().withBody(redFlag))
+      val resultRedFlag = controller.move(createdUid)(fakeRequest().withBody(redFlag))
       status(resultRedFlag) mustEqual OK
 
-      val resultClearFlag = controller.move(createdUid)(FakeRequest().withBody(clearFlag))
+      val resultClearFlag = controller.move(createdUid)(fakeRequest().withBody(clearFlag))
 
       status(resultClearFlag) mustEqual OK
       val jsonResult = contentAsJson(resultClearFlag)
@@ -138,7 +142,7 @@ class GameControllerTest extends BaseControllerTest {
     "set preserved status" in {
       val createdUid = createBoard()
 
-      val result = controller.setBoardIsActive(createdUid)(FakeRequest().withBody(false))
+      val result = controller.setBoardIsActive(createdUid)(fakeRequest().withBody(false))
 
       status(result) mustEqual OK
       val jsonResult = contentAsJson(result)
@@ -148,10 +152,10 @@ class GameControllerTest extends BaseControllerTest {
     "set active status" in {
       val createdUid = createBoard()
 
-      val result = controller.setBoardIsActive(createdUid)(FakeRequest().withBody(false))
+      val result = controller.setBoardIsActive(createdUid)(fakeRequest().withBody(false))
       status(result) mustEqual OK
 
-      val activeRequest = FakeRequest().withBody(true)
+      val activeRequest = fakeRequest().withBody(true)
       val resultActive = controller.setBoardIsActive(createdUid)(activeRequest)
 
       status(resultActive) mustEqual OK
@@ -165,7 +169,7 @@ class GameControllerTest extends BaseControllerTest {
         val move = PlayerMove(PlayerMoveType.QuestionMark, Coordinates(-1, 1))
 
         intercept[PlayerMoveOutOfBounds] {
-          status(controller.move(createdUid)(FakeRequest().withBody(move)))
+          status(controller.move(createdUid)(fakeRequest().withBody(move)))
         }
       }
       "column is less than 0" in {
@@ -173,7 +177,7 @@ class GameControllerTest extends BaseControllerTest {
         val move = PlayerMove(PlayerMoveType.QuestionMark, Coordinates(1, -1))
 
         intercept[PlayerMoveOutOfBounds] {
-          status(controller.move(createdUid)(FakeRequest().withBody(move)))
+          status(controller.move(createdUid)(fakeRequest().withBody(move)))
         }
       }
       "row is out of bound" in {
@@ -181,7 +185,7 @@ class GameControllerTest extends BaseControllerTest {
         val move = PlayerMove(PlayerMoveType.QuestionMark, Coordinates(1, 11))
 
         intercept[PlayerMoveOutOfBounds] {
-          status(controller.move(createdUid)(FakeRequest().withBody(move)))
+          status(controller.move(createdUid)(fakeRequest().withBody(move)))
         }
       }
       "column is out of bound" in {
@@ -189,14 +193,14 @@ class GameControllerTest extends BaseControllerTest {
         val move = PlayerMove(PlayerMoveType.QuestionMark, Coordinates(12, 1))
 
         intercept[PlayerMoveOutOfBounds] {
-          status(controller.move(createdUid)(FakeRequest().withBody(move)))
+          status(controller.move(createdUid)(fakeRequest().withBody(move)))
         }
       }
     }
   }
 
   private def createBoard() = {
-    val requestBody = FakeRequest().withBody(BoardConfiguration(10, 10, 10))
+    val requestBody = fakeRequest().withBody(BoardConfiguration(10, 10, 10))
     (contentAsJson(controller.createBoard()(requestBody)) \ "uid").as[String]
   }
 }

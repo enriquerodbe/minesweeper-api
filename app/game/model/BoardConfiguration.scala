@@ -24,7 +24,7 @@ case class BoardConfiguration(numRows: Int, numColumns: Int, numMines: Int) {
     )
   }
 
-  private def generateUid(): String = Random.alphanumeric.take(6).mkString
+  private def generateUid(): BoardUid = BoardUid(Random.alphanumeric.take(6).mkString)
 
   private def hasMine(coordinates: Coordinates, mines: Set[Int]): Boolean = {
     mines.contains(coordinates.row * numColumns + coordinates.column)

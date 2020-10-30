@@ -2,7 +2,23 @@ openapi: "3.0.3"
 info:
   title: "Minesweeper API"
   version: "1.0.0"
+security:
+  - XAuthTokenHeader: []
 components:
+  securitySchemes:
+    XAuthTokenHeader:
+      type: apiKey
+      in: header
+      name: X-Auth-Token
+  responses:
+    BadRequest:
+      description: Invalid input data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: User isn't authenticated or token is invalid
   schemas:
     Credentials:
       properties:
@@ -54,7 +70,6 @@ components:
       type: string
       enum: [reveal, redFlag, questionMark, clearFlag]
     Coordinates:
-      type: object
       properties:
         row:
           type: integer
@@ -70,3 +85,13 @@ components:
           $ref: '#/components/schemas/PlayerMoveType'
         coordinates:
           $ref: '#/components/schemas/Coordinates'
+    ErrorResponse:
+      properties:
+        error:
+          properties:
+            requestId:
+              type: integer
+              description: Number to identify the request
+            message:
+              type: string
+              description: Description of the error

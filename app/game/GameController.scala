@@ -3,8 +3,10 @@ package game
 import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
+import auth.AuthEnv
+import com.mohiva.play.silhouette.api.Silhouette
 import game.BoardSerializers._
-import game.model.{Board, BoardConfiguration, PlayerMove}
+import game.model.{Board, BoardConfiguration, BoardUid, PlayerMove}
 import javax.inject.{Inject, Named, Singleton}
 import play.api.libs.json.Json.toJson
 import play.api.mvc.{BaseController, ControllerComponents}
@@ -14,35 +16,36 @@ import scala.concurrent.duration.DurationInt
 @Singleton
 class GameController @Inject()(
     val controllerComponents: ControllerComponents,
+    silhouette: Silhouette[AuthEnv],
     @Named("gameService") gameService: ActorRef)(
     implicit ec: ExecutionContext)
   extends BaseController {
 
+  import silhouette.SecuredAction
   implicit val timeout: Timeout = 2.seconds
-  val FixedOwnerId = "test"
 
-  def createBoard() = Action.async(parse.json[BoardConfiguration]) { request =>
-    val futureResponse = gameService ? GameService.CreateBoard(FixedOwnerId, request.body)
+  def createBoard() = SecuredAction.async(parse.json[BoardConfiguration]) { request =>
+    val futureResponse = gameService ? GameService.CreateBoard(request.identity, request.body)
     futureResponse.mapTo[Board].map(toJson(_)(boardSummaryWrites)).map(Created(_))
   }
 
-  def retrieveAllBoards() = Action.async {
-    val futureResponse = gameService ? GameService.RetrieveAllBoards(FixedOwnerId)
+  def retrieveAllBoards() = SecuredAction.async { request =>
+    val futureResponse = gameService ? GameService.RetrieveAllBoards(request.identity)
     futureResponse.mapTo[Seq[Board]].map(toJson(_)(bardSummarySeqWrites)).map(Ok(_))
   }
 
-  def retrieveBoard(boardUid: String) = Action.async {
-    val futureResponse = gameService ? GameService.RetrieveBoard(FixedOwnerId, boardUid)
-    futureResponse.mapTo[Board].map(toJson(_)(boardDetailsWrites)).map(Ok(_))
+  def retrieveBoard(boardUid: String) = SecuredAction.async { request =>
+    val message = GameService.RetrieveBoard(request.identity, BoardUid(boardUid))
+    (gameService ? message).mapTo[Board].map(toJson(_)(boardDetailsWrites)).map(Ok(_))
   }
 
-  def move(boardUid: String) = Action.async(parse.json[PlayerMove]) { request =>
-    val futureResponse = gameService ? GameService.Move(FixedOwnerId, boardUid, request.body)
-    futureResponse.mapTo[Board].map(toJson(_)(boardDetailsWrites)).map(Ok(_))
+  def move(boardUid: String) = SecuredAction.async(parse.json[PlayerMove]) { request =>
+    val message = GameService.Move(request.identity, BoardUid(boardUid), request.body)
+    (gameService ? message).mapTo[Board].map(toJson(_)(boardDetailsWrites)).map(Ok(_))
   }
 
-  def setBoardIsActive(boardUid: String) = Action.async(parse.json[Boolean]) { request =>
-    val futureResponse = gameService ? GameService.SetIsActive(FixedOwnerId, boardUid, request.body)
-    futureResponse.mapTo[Board].map(toJson(_)(boardSummaryWrites)).map(Ok(_))
+  def setBoardIsActive(boardUid: String) = SecuredAction.async(parse.json[Boolean]) { request =>
+    val message = GameService.SetIsActive(request.identity, BoardUid(boardUid), request.body)
+    (gameService ? message).mapTo[Board].map(toJson(_)(boardSummaryWrites)).map(Ok(_))
   }
 }

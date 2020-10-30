@@ -1,4 +1,6 @@
 import play.core.PlayVersion.akkaVersion
+val silhouetteVersion = "7.0.0"
+scalaVersion := "2.13.3"
 
 name := """minesweeper-api"""
 organization := "quique"
@@ -7,13 +9,15 @@ version := "1.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala, SwaggerPlugin)
 
-scalaVersion := "2.13.3"
-
 libraryDependencies ++= Seq(
   guice,
   "com.typesafe.akka" %% "akka-persistence" % akkaVersion,
   "com.typesafe.akka" %% "akka-serialization-jackson" % akkaVersion,
   "org.fusesource.leveldbjni" % "leveldbjni-all" % "1.8",
+  "com.mohiva" %% "play-silhouette" % silhouetteVersion,
+  "com.mohiva" %% "play-silhouette-password-bcrypt" % silhouetteVersion,
+  "com.mohiva" %% "play-silhouette-persistence" % silhouetteVersion,
+  "net.codingwell" %% "scala-guice" % "4.2.11",
 )
 
 libraryDependencies ++= Seq(
@@ -29,7 +33,6 @@ swaggerV3 := true
 play.sbt.routes.RoutesKeys.routesImport := Seq.empty
 
 // Scoverage
-coverageEnabled := true
 coverageMinimum := 90
 coverageFailOnMinimum := true
 coverageExcludedPackages := Seq(

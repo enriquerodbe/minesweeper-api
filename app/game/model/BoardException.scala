@@ -19,11 +19,11 @@ object BoardException {
   case class PlayerMoveOutOfBounds(coordinates: Coordinates, configuration: BoardConfiguration)
     extends BoardException(
       s"Move $coordinates out of bounds. " +
-      s"Coordinates must be >= 0. " +
-      s"Rows must be <= ${configuration.lastRowIndex}. " +
-      s"Columns must be <= ${configuration.lastColumnIndex}."
+      s"Any coordinate must be >= 0. " +
+      s"Row must be <= ${configuration.lastRowIndex}. " +
+      s"Column must be <= ${configuration.lastColumnIndex}."
     )
 
-  case class BoardUidNotFound(boardUid: String)
-    extends BoardException(s"Board UID $boardUid not found.")
+  case class BoardUidNotFound(boardUid: BoardUid)
+    extends BoardException(s"Board UID ${boardUid.value} not found.")
 }
