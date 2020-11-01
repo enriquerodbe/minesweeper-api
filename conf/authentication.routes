@@ -9,8 +9,12 @@
 #        schema:
 #          $ref: '#/components/schemas/Credentials'
 # responses:
-#   201:
+#   200:
 #     description: Successfuly registered
+#     content:
+#       application/json:
+#         schema:
+#           $ref: '#/components/schemas/AuthToken'
 #     headers:
 #       X-Auth-Token:
 #         description: The auth token for subsequent requests
@@ -34,8 +38,12 @@ POST  /    auth.AuthController.register()
 #        schema:
 #          $ref: '#/components/schemas/Credentials'
 # responses:
-#   204:
+#   200:
 #     description: Successfuly logged in
+#     content:
+#       application/json:
+#         schema:
+#           $ref: '#/components/schemas/AuthToken'
 #     headers:
 #       X-Auth-Token:
 #         schema:

@@ -1,7 +1,10 @@
 openapi: "3.0.3"
 info:
   title: "Minesweeper API"
+  description: "REST API for Minesweeper"
   version: "1.0.0"
+servers:
+  - url: "http://localhost:9000"
 security:
   - XAuthTokenHeader: []
 components:
@@ -11,6 +14,12 @@ components:
       in: header
       name: X-Auth-Token
   responses:
+    Authorized:
+      description: Credentials successfuly authorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthToken'
     BadRequest:
       description: Invalid input data
       content:
@@ -25,47 +34,67 @@ components:
         email:
           type: string
           format: email
+          nullable: false
         password:
           type: string
           format: password
+          nullable: false
           minLength: 4
+    AuthToken:
+      properties:
+        token:
+          type: string
+          nullable: false
     BoardConfiguration:
       properties:
         rows:
           type: integer
+          nullable: false
           minimum: 2
           maximum: 20
         columns:
           type: integer
+          nullable: false
           minimum: 2
           maximum: 20
         mines:
           type: integer
+          nullable: false
           minimum: 1
     BoardSummary:
       properties:
         uid:
           type: string
+          nullable: false
         rows:
           type: integer
+          nullable: false
         columns:
           type: integer
+          nullable: false
         mines:
           type: integer
+          nullable: false
         isActive:
           type: boolean
+          nullable: false
         isGameOver:
           type: boolean
+          nullable: false
     BoardDetails:
       properties:
         cells:
           type: array
+          nullable: false
           items:
             type: array
+            nullable: false
             items:
               type: integer
+              nullable: false
         stringRepresentation:
           type: string
+          nullable: false
     PlayerMoveType:
       type: string
       enum: [reveal, redFlag, questionMark, clearFlag]
@@ -73,10 +102,12 @@ components:
       properties:
         row:
           type: integer
+          nullable: false
           minimum: 0
           maximum: 20
         column:
           type: integer
+          nullable: false
           minimum: 0
           maximum: 20
     PlayerMove:
@@ -91,7 +122,9 @@ components:
           properties:
             requestId:
               type: integer
+              nullable: false
               description: Number to identify the request
             message:
               type: string
+              nullable: false
               description: Description of the error

@@ -11,6 +11,7 @@ import com.mohiva.play.silhouette.impl.exceptions.IdentityNotFoundException
 import com.mohiva.play.silhouette.impl.providers.CredentialsProvider
 import com.mohiva.play.silhouette.persistence.daos.DelegableAuthInfoDAO
 import javax.inject.{Inject, Singleton}
+import play.api.libs.json.Json
 import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure
@@ -41,7 +42,7 @@ class AuthController @Inject()(
       _ <- authInfoDao.save(loginInfo, hasher.hash(credentials.password))
       authenticator <- authenticatorService.create(loginInfo)
       token <- authenticatorService.init(authenticator)
-      result <- authenticatorService.embed(token, Created)
+      result <- authenticatorService.embed(token, Ok(Json.obj("token" -> token)))
     } yield result
   }
 
@@ -51,7 +52,7 @@ class AuthController @Inject()(
       loginInfo <- credentialsProvider.authenticate(SilhouetteCredentials(email, password))
       authenticator <- authenticatorService.create(loginInfo)
       token <- authenticatorService.init(authenticator)
-      result <- authenticatorService.embed(token, NoContent)
+      result <- authenticatorService.embed(token, Ok(Json.obj("token" -> token)))
     } yield result
 
     result.recover {
