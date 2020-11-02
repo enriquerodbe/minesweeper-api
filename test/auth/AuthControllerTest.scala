@@ -16,7 +16,7 @@ class AuthControllerTest extends BaseControllerTest {
 
       val result = controller.register()(FakeRequest().withBody(credentials))
 
-      status(result) mustEqual CREATED
+      status(result) mustEqual OK
       header("X-Auth-Token", result) mustBe defined
     }
 
@@ -24,7 +24,7 @@ class AuthControllerTest extends BaseControllerTest {
       val credentials = Credentials("dup@minesweeper.com", "dupTestPassword")
 
       val result = controller.register()(FakeRequest().withBody(credentials))
-      status(result) mustEqual CREATED
+      status(result) mustEqual OK
 
       intercept[UserAlreadyExists] {
         status(controller.register()(FakeRequest().withBody(credentials)))
@@ -34,7 +34,7 @@ class AuthControllerTest extends BaseControllerTest {
     "login an existing user" in {
       val result = controller.login()(FakeRequest().withBody(validCredentials))
 
-      status(result) mustEqual NO_CONTENT
+      status(result) mustEqual OK
       header("X-Auth-Token", result) mustBe defined
     }
 

@@ -1,11 +1,12 @@
 import play.core.PlayVersion.akkaVersion
 val silhouetteVersion = "7.0.0"
 scalaVersion := "2.13.3"
+maintainer := "enriquerodbe@gmail.com"
 
 name := """minesweeper-api"""
 organization := "quique"
 
-version := "1.0-SNAPSHOT"
+version := sys.props.getOrElse("minesweeper.api.version", "1.0.0")
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala, SwaggerPlugin)
 
@@ -42,3 +43,8 @@ coverageExcludedPackages := Seq(
   "authentication",
   "games",
 ).mkString(";")
+
+// Dist files
+sources in (Compile, doc) := Seq.empty
+publishArtifact in (Compile, packageDoc) := false
+topLevelDirectory := None

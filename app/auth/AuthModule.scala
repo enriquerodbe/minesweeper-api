@@ -13,9 +13,9 @@ import com.mohiva.play.silhouette.password.BCryptPasswordHasher
 import com.mohiva.play.silhouette.persistence.daos.DelegableAuthInfoDAO
 import com.mohiva.play.silhouette.persistence.repositories.DelegableAuthInfoRepository
 import net.codingwell.scalaguice.ScalaModule
+import play.api.Configuration
 import play.api.libs.concurrent.AkkaGuiceSupport
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Random
 
 class AuthModule extends AbstractModule with AkkaGuiceSupport with ScalaModule {
 
@@ -55,8 +55,8 @@ class AuthModule extends AbstractModule with AkkaGuiceSupport with ScalaModule {
   }
 
   @Provides
-  def provideJwtAuthenticatorSettings(): JWTAuthenticatorSettings = {
-    JWTAuthenticatorSettings(sharedSecret = Random.alphanumeric.take(256).mkString)
+  def provideJwtAuthenticatorSettings(configuration: Configuration): JWTAuthenticatorSettings = {
+    JWTAuthenticatorSettings(sharedSecret = configuration.get[String]("play.http.secret.key"))
   }
 
   @Provides

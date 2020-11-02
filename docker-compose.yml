@@ -1,0 +1,20 @@
+version: '3'
+services:
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "80:8080"
+    environment:
+      - API_URL=http://localhost:9000/assets/swagger.json
+    depends_on:
+      - app
+    restart: unless-stopped
+  app:
+    image: enriquerodbe/minesweeper-api:latest
+    ports:
+      - "9000:9000"
+    environment:
+      - APPLICATION_SECRET=/0]J<MsSE=ViSOFq]Tss?FI48uMgRm@4W:55G6JbXWKP26XIxlyiUFnvlOj<pS6n
+      - ALLOWED_HOST=localhost
+      - CORS_SWAGGERUI_ORIGIN=http://localhost
+    restart: unless-stopped
