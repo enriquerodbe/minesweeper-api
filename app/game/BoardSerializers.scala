@@ -25,10 +25,6 @@ object BoardSerializers {
     )
   }
 
-  val bardSummarySeqWrites: Writes[Seq[Board]] = Writes { b =>
-    JsArray(b.map(Json.toJson(_)(boardSummaryWrites)))
-  }
-
   val boardDetailsWrites: Writes[Board] = Writes { board =>
     Json.obj(
       "cells" -> board.cells.map(_.map(_.toCodeNumber)),

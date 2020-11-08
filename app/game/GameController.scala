@@ -6,9 +6,10 @@ import akka.util.Timeout
 import auth.AuthEnv
 import com.mohiva.play.silhouette.api.Silhouette
 import game.BoardSerializers._
-import game.model.{Board, BoardConfiguration, BoardUid, PlayerMove}
+import game.model._
 import javax.inject.{Inject, Named, Singleton}
 import play.api.libs.json.Json.toJson
+import play.api.libs.json.Writes.seq
 import play.api.mvc.{BaseController, ControllerComponents}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
@@ -31,7 +32,7 @@ class GameController @Inject()(
 
   def retrieveAllBoards() = SecuredAction.async { request =>
     val futureResponse = gameService ? GameService.RetrieveAllBoards(request.identity)
-    futureResponse.mapTo[Seq[Board]].map(toJson(_)(bardSummarySeqWrites)).map(Ok(_))
+    futureResponse.mapTo[Seq[Board]].map(toJson(_)(seq(boardSummaryWrites))).map(Ok(_))
   }
 
   def retrieveBoard(boardUid: String) = SecuredAction.async { request =>

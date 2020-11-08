@@ -42,7 +42,7 @@ class GameService @Inject()(configuration: Configuration) extends Actor {
     context.child(name).getOrElse(context.actorOf(Player.props(player), name))
   }
 
-  private def makeActorName(player: Email): String = s"${player.value}"
+  private def makeActorName(player: Email): String = player.value
 
   private def validateBoardConfig(config: BoardConfiguration): Try[BoardConfiguration] = {
     if (config.size < MinBoardSize) {
